@@ -1,0 +1,11 @@
+import { usePage } from "@/hooks/usePage"
+
+export default function {{properCase type}}Page() {
+  const page = usePage("{{type}}")
+  return (
+    <div>
+      <h1>{{properCase type}}</h1>
+      <pre>{JSON.stringify(page, null, 2)}</pre>
+    </div>
+  )
+}

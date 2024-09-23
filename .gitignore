@@ -1,0 +1,41 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Kirby
+www/assets/build
+www/content
+www/media/*
+!www/media/index.html
+.lock
+www/site/cache/*
+!www/site/cache/index.html
+www/site/accounts/*
+!www/site/accounts/index.html
+www/site/sessions/*
+!www/site/sessions/index.html
+www/site/config/.license
+
+# Panda
+src/styled-system

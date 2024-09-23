@@ -1,0 +1,12 @@
+<?php
+
+use Kirby\Cms\Page;
+
+return function (Page $page) {
+  return [
+    "type" => "default",
+    "title" => $page->title()->value(),
+    "url" => $page->url(),
+    "content" => $page->content()->toArray(),
+  ];
+};
