@@ -1,5 +1,33 @@
 title: Site
-
-sections:
+tabs:
   pages:
-    type: pages
+    icon: page
+    sections:
+      pages:
+        type: pages
+  files:
+    icon: file
+    sections:
+      files:
+        type: files
+  globals:
+    icon: globe
+    sections:
+      globals:
+        type: fields
+        fields: {}
+  meta:
+    icon: search
+    fields:
+      defaultMetaImage:
+        label: Default Image
+        extends: fields/image
+        multiple: false
+        width: 1/2
+      defaultMetaDescription:
+        label: Default Description
+        type: files
+        multiple: false
+        type: textarea
+        buttons: false
+        width: 1/2

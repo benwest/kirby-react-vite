@@ -1,0 +1,7 @@
+label: Image
+type: files
+multiple: false
+layout: cards
+size: medium
+query: page.files.filterBy('template', 'image')
+uploads: image

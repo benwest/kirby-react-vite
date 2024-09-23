@@ -1,21 +1,12 @@
 title: Default Page
-
-columns:
-  main:
-    width: 2/3
-    sections:
-      fields:
-        type: fields
-        fields:
-          text:
-            type: textarea
-            size: huge
-  sidebar:
-    width: 1/3
-    sections:
-      pages:
-        type: pages
-        template: default
-      files:
-        type: files
-
+tabs:
+  content:
+    icon: text
+    columns:
+      - width: 3/4
+        fields: []
+      - width: 1/4
+        sections:
+          files:
+            type: files
+  meta: tabs/meta
