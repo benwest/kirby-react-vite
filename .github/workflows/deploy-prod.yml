@@ -33,4 +33,4 @@
 #           REMOTE_HOST: opal11.opalstack.com
 #           REMOTE_USER: benwest
 #           TARGET: apps/krv
-#           EXCLUDE: "/content, /site/accounts, /site/cache, /site/sessions"
+#           EXCLUDE: "/content, /media, /site/accounts, /site/cache, /site/sessions"
