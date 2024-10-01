@@ -9,9 +9,8 @@ export type ErrorPageContent = z.infer<typeof ErrorPageContent>
 
 export const DefaultPageContent = z.object({
   type: z.literal("default"),
-  title: z.string(),
   url: z.string(),
-  content: z.record(z.any()),
+  title: z.string(),
 })
 export type DefaultPageContent = z.infer<typeof DefaultPageContent>
 
