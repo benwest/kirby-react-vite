@@ -12,10 +12,10 @@ interface PageProviderProps {
 }
 export function PageProvider({ children }: PageProviderProps) {
   const loaderData = useLoaderData()
-  const page = useMemo(() => PageContent.parse(loaderData), [loaderData])
   if (!didLog) {
-    console.log({ page, site })
+    console.log({ page: loaderData, site })
     didLog = true
   }
+  const page = useMemo(() => PageContent.parse(loaderData), [loaderData])
   return <PageContext.Provider value={page}>{children}</PageContext.Provider>
 }
