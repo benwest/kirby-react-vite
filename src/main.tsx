@@ -7,8 +7,13 @@ import "./style.css"
 const router = createBrowserRouter([
   {
     path: "/*",
-    loader: async ({ params: { "*": path }, request }) => {
-      const url = `/${path || "home"}.json`
+    loader: async ({ request }) => {
+      const url = new URL(request.url)
+      if (url.pathname === "/") {
+        url.pathname = "/home.json"
+      } else {
+        url.pathname = url.pathname + ".json"
+      }
       return fetch(url, { signal: request.signal })
     },
     element: <App />,

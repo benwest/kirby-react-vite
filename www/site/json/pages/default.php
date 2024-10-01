@@ -7,6 +7,5 @@ return function (Page $page) {
     "type" => "default",
     "title" => $page->title()->value(),
     "url" => $page->url(),
-    "content" => $page->content()->toArray(),
   ];
 };

@@ -2,7 +2,7 @@ import { z } from "zod"
 
 export const ImageFileContent = z.object({
   type: z.literal("image"),
-  srcset: z.string(),
+  srcSet: z.string(),
   ratio: z.number(),
 })
 
