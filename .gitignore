@@ -33,6 +33,3 @@ www/site/accounts/*
 www/site/sessions/*
 !www/site/sessions/index.html
 www/site/config/.license
-
-# Panda
-src/styled-system

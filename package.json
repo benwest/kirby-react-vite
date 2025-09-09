@@ -4,7 +4,6 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "prepare": "panda codegen",
     "serve": "php -S localhost:8000 -c php.ini -t www www/kirby/router.php",
     "dev": "npm run serve & vite",
     "build": "vite build",
