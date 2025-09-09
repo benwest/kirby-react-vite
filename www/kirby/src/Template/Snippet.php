@@ -5,6 +5,7 @@ namespace Kirby\Template;
 use Kirby\Cms\App;
 use Kirby\Exception\InvalidArgumentException;
 use Kirby\Exception\LogicException;
+use Kirby\Filesystem\F;
 use Kirby\Toolkit\A;
 use Kirby\Toolkit\Tpl;
 
@@ -27,7 +28,6 @@ class Snippet extends Tpl
 	 * snippet. This is used to start
 	 * and end slots within this snippet
 	 * in the helper functions
-	 * @internal
 	 */
 	public static self|null $current = null;
 
@@ -101,12 +101,14 @@ class Snippet extends Tpl
 		// is only supported if the snippet has
 		// been started before
 		if ($this->open === false) {
-			throw new LogicException('The snippet has not been opened');
+			throw new LogicException(
+				message: 'The snippet has not been opened'
+			);
 		}
 
 		// create a default slot for the content
 		// that has been captured between start and end
-		if (empty($this->slots) === true) {
+		if ($this->slots === []) {
 			$this->slots['default'] = new Slot('default');
 			$this->slots['default']->content = ob_get_clean();
 		} else {
@@ -187,7 +189,7 @@ class Snippet extends Tpl
 			$name = (string)$name;
 			$file = $root . '/' . $name . '.php';
 
-			if (file_exists($file) === false) {
+			if (F::exists($file, $root) === false) {
 				$file = $kirby->extensions('snippets')[$name] ?? null;
 			}
 
@@ -290,19 +292,21 @@ class Snippet extends Tpl
 	): array {
 		// initialize a dummy slots object and cache it for better performance
 		$slots ??= static::$dummySlots ??= new Slots([]);
-
-		$data = array_merge(App::instance()->data, $data);
+		$data    = [...App::instance()->data, ...$data];
 
 		if (
 			array_key_exists('slot', $data) === true ||
 			array_key_exists('slots', $data) === true
 		) {
-			throw new InvalidArgumentException('Passing the $slot or $slots variables to snippets is not supported.');
+			throw new InvalidArgumentException(
+				message: 'Passing the $slot or $slots variables to snippets is not supported.'
+			);
 		}
 
-		return array_merge($data, [
+		return [
+			...$data,
 			'slot'  => $slots->default,
 			'slots' => $slots,
-		]);
+		];
 	}
 }

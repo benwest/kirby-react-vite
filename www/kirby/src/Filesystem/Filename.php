@@ -2,9 +2,9 @@
 
 namespace Kirby\Filesystem;
 
-use Kirby\Cms\App;
 use Kirby\Cms\Language;
 use Kirby\Toolkit\Str;
+use Stringable;
 
 /**
  * The `Filename` class handles complex
@@ -28,7 +28,7 @@ use Kirby\Toolkit\Str;
  * @copyright Bastian Allgeier
  * @license   https://getkirby.com/license
  */
-class Filename
+class Filename implements Stringable
 {
 	/**
 	 * The sanitized file extension
@@ -49,7 +49,8 @@ class Filename
 	public function __construct(
 		protected string $filename,
 		protected string $template,
-		protected array $attributes = []
+		protected array $attributes = [],
+		protected string|null $language = null
 	) {
 		$this->name      = $this->sanitizeName($filename);
 		$this->extension = $this->sanitizeExtension(
@@ -109,7 +110,10 @@ class Filename
 
 			$result[] = match ($key) {
 				'dimensions' => $value,
-				'crop'       => ($value === 'center') ? 'crop' : $key . '-' . $value,
+				'crop'       => match ($value) {
+					'center' => 'crop',
+					default  => $key . '-' . $value
+				},
 				default      => $key . $value
 			};
 		}
@@ -188,7 +192,11 @@ class Filename
 	public function grayscale(): bool
 	{
 		// normalize options
-		$value = $this->attributes['grayscale'] ?? $this->attributes['greyscale'] ?? $this->attributes['bw'] ?? false;
+		$value =
+			$this->attributes['grayscale'] ??
+			$this->attributes['greyscale'] ??
+			$this->attributes['bw'] ??
+			false;
 
 		// turn anything into boolean
 		return filter_var($value, FILTER_VALIDATE_BOOLEAN);
@@ -234,13 +242,12 @@ class Filename
 	{
 		// temporarily store language rules
 		$rules = Str::$language;
-		$kirby = App::instance(null, true);
 
-		// if current user, add rules for their language to `Str` class
-		if ($user = $kirby?->user()) {
+		// add rules for a particular language to `Str` class
+		if ($this->language !== null) {
 			Str::$language = [
 				...Str::$language,
-				...Language::loadRules($user->language())];
+				...Language::loadRules($this->language)];
 		}
 
 		// sanitize name

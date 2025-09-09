@@ -1,0 +1,13 @@
+@import "tailwindcss";
+@import "./fonts.css";
+
+@theme {
+}
+
+:root {
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  display: contents;
+}

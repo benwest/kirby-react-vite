@@ -1,57 +1,33 @@
 <?php
 
 use Kirby\Cms\App;
+use Kirby\Content\Field;
 use Kirby\Filesystem\F;
-use Kirby\Filesystem\Dir;
 use Kirby\Http\Response;
-
-class Json {
-
-  static $types = [];
-
-  static function extend(array $types) {
-    foreach ($types as $type => $view) {
-      self::$types[$type] = array_merge(self::$types[$type] ?? [], $view);
-    }
-  }
-
-  static function loadDir(string $dir) {
-    $types = [];
-    foreach (Dir::dirs($dir) as $type) {
-      $views = [];
-      foreach (Dir::files($dir . '/' . $type) as $view) {
-        $views[F::name($view)] = F::load("$dir/$type/$view");
-      }
-      $types[$type] = $views;
-    }
-    self::extend($types);
-  }
-
-  static function has(string $type, string $view) {
-    return isset(self::$types[$type]) && isset(self::$types[$type][$view]);
-  }
-
-  static function get(string $type, string $view, ...$args) {
-    if (!self::has($type, $view)) return null;
-    return self::$types[$type][$view](...$args);
-  }
-  
-  static function match(string $type, array $views, ...$args) {
-    foreach ($views as $view) {
-      if (!$view) continue;
-      if (!self::has($type, $view)) continue;
-      return self::get($type, $view, ...$args);
-    }
-    return null;
-  }
-}
-
-Json::loadDir(kirby()->root('site') . '/json');
+use Kirby\Toolkit\Str;
 
 App::plugin('bewe/json', [
+  'options' => [
+    'root' => kirby()->root('site') . '/json',
+  ],
   'siteMethods' => [
-    'json' => function (string $view = null) {
-      return Json::match('site', [$view, 'default'], $this);
+    'loadJson' => function (string $path, ...$args) {
+      $root = option('bewe.json.root');
+      $path = "$root/$path.php";
+      if (!F::exists($path))
+        return null;
+      try {
+        return F::load($path)(...$args);
+      } catch (Exception $e) {
+        return [
+          'error' => $e->getMessage(),
+          'file' => $e->getFile(),
+          'line' => $e->getLine(),
+        ];
+      }
+    },
+    'json' => function () {
+      return $this->loadJson('site', $this);
     },
   ],
   'pageMethods' => [
@@ -61,60 +37,91 @@ App::plugin('bewe/json', [
       }
       return $this->url() . '.json';
     },
-    'json' => function (string $view = null) {
-      return Json::match("pages", [$view, $this->intendedTemplate()->name(), 'default'], $this);
+    'json' => function (string $type = null) {
+      $site = site();
+      return $site->loadJson('pages/' . $this->intendedTemplate()->name(), $this)
+        ?? $site->loadJson('pages/default', $this);
     },
   ],
-  "pagesMethods" => [
-    'json' => function (string $view = null) {
-      return $this->map(function ($page) use ($view) {
-        return $page->json($view);
-      })->values();
+  'pagesMethods' => [
+    'json' => function () {
+      return $this->map(fn($page) => $page->json())->values();
     },
   ],
   'fileMethods' => [
-    'json' => function (string $view = null) {
-      return Json::match("files", [$view, $this->template(), $this->type(), 'default'], $this);
+    'json' => function () {
+      $site = site();
+      return $site->loadJson('files/' . $this->intendedTemplate()->name(), $this)
+        ?? $site->loadJson('files/' . $this->type(), $this)
+        ?? $site->loadJson('files/default', $this);
     },
   ],
-  "filesMethods" => [
-    'json' => function (string $view = null) {
-      return $this->map(function ($file) use ($view) {
-        return $file->json($view);
-      })->values();
+  'filesMethods' => [
+    'json' => function () {
+      return $this->map(fn($file) => $file->json())->values();
     },
   ],
-  "blockMethods" => [
-    'json' => function (string $view = null) {
-      return Json::match("blocks", [$view, $this->type(), 'default'], $this);
+  'fieldMethods' => [
+    'toFileJson' => function (Field $field) {
+      if ($file = $field->toFile())
+        return $file->json();
+      return null;
     },
   ],
-  "blocksMethods" => [
-    'json' => function (string $view = null) {
-      return $this->map(function ($block) use ($view) {
-        return $block->json($view);
-      })->values();
+  'blockMethods' => [
+    'json' => function () {
+      $site = site();
+      return $site->loadJson('blocks/' . $this->type(), $this)
+        ?? $site->loadJson('blocks/default', $this);
     },
   ],
-  "userMethods" => [
-    'json' => function (string $view = null) {
-      return Json::match("users", [$view, $this->role()->name(), 'default'], $this);
+  'blocksMethods' => [
+    'json' => function () {
+      return $this->map(fn($block) => $block->json())->values();
     },
   ],
-  "usersMethods" => [
-    'json' => function (string $view = null) {
-      return $this->map(function ($user) use ($view) {
-        return $user->json($view);
-      })->values();
+  'userMethods' => [
+    'json' => function () {
+      $site = site();
+      return $site->loadJson('users/' . $this->role()->name(), $this)
+        ?? $site->loadJson('users/default', $this);
+    },
+  ],
+  'usersMethods' => [
+    'json' => function () {
+      return $this->map(fn($user) => $user->json())->values();
     },
   ],
   'routes' => [
     [
-      "pattern" => "(:all).json",
-      "action" => function ($path) {
-        $page = page($path);
-        $json = $page ? $page->json() : site()->errorPage()->json();
-        return new Response(json_encode($json), 'application/json');
+      'pattern' => '(:all).json',
+      'language' => '*',
+      'action' => function (...$args) {
+        $kirby = kirby();
+        $multilang = $kirby->multilang();
+
+        $language = $multilang ? $args[0] : null;
+        $path = $multilang ? $args[1] : $args[0];
+
+        if ($language) {
+          $kirby->setCurrentLanguage($language);
+        }
+
+        $path = Str::rtrim($path, '.json');
+
+        if ($path === 'site') {
+          return Response::json(site()->json());
+        }
+
+        $page = kirby()->resolve($path, $language) ?? site()->errorPage();
+
+        if ($page) {
+          site()->visit($page, $language?->code());
+          $json = $page->json();
+          return Response::json($json);
+        }
+
+        return null;
       }
     ],
   ],
