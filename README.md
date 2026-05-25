@@ -62,12 +62,16 @@ kirby-react-vite/
 │   │   ├── default.tsx
 │   │   ├── error.tsx
 │   │   └── home.tsx
-│   ├── types/              # Zod schemas for Kirby data
+│   ├── types/
 │   │   ├── common.ts
-│   │   ├── files.ts
-│   │   ├── pages.ts
 │   │   ├── site.ts
-│   │   └── index.ts
+│   │   ├── files/
+│   │   │   └── image.ts
+│   │   └── pages/          # One file per page type
+│   │       ├── index.ts    # PageContent union
+│   │       ├── default.ts
+│   │       ├── error.ts
+│   │       └── home.ts
 │   ├── utils/
 │   │   ├── getCssVariable.ts
 │   │   ├── isUrlExternal.ts
@@ -99,37 +103,18 @@ Use the plop generator:
 npx plop page
 ```
 
-Enter the template name (e.g. `about`). This creates `src/pages/about.tsx`.
+Enter the template name in kebab-case (e.g. `team-member`). This creates four files and patches `src/types/pages/index.ts`:
 
-You'll also need to:
+| File | Purpose |
+|------|---------|
+| `www/site/blueprints/pages/team-member.yml` | Kirby panel fields |
+| `www/site/json/pages/team-member.php` | JSON shape returned by Kirby |
+| `src/types/pages/team-member.ts` | Zod schema matching that JSON |
+| `src/pages/team-member.tsx` | React page component |
 
-1. Add a JSON template at `www/site/json/pages/about.php`:
+The files open in that order — blueprint first since that's where you define the fields.
 
-```php
-<?php
-use Kirby\Cms\Page;
-
-return function (Page $page) {
-  return [
-    'type'  => 'about',
-    'title' => $page->title()->value(),
-    'url'   => $page->url(),
-  ];
-};
-```
-
-2. Add a Zod schema in `src/types/pages.ts`:
-
-```ts
-export const AboutPageContent = z.object({
-  type: z.literal("about"),
-  url: z.string(),
-  title: z.string(),
-})
-export type AboutPageContent = z.infer<typeof AboutPageContent>
-```
-
-3. Add it to the `PageContent` discriminated union in the same file.
+Page routing is automatic: `src/components/Page/Page.tsx` uses `import.meta.glob` to load the right component from `src/pages/` based on the `type` field in the page JSON.
 
 ## The `json` plugin
 
@@ -180,13 +165,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 ```tsx
 // In any page component
-const page = usePage("home")   // typed as HomePageContent
-const site = useSite()         // typed as SiteContent
+const page = usePage("team-member")   // typed as TeamMemberPageContent
+const site = useSite()                // typed as SiteContent
 ```
 
 ## Generators
 
 ```bash
 npx plop component   # creates src/components/MyComponent/
-npx plop page        # creates src/pages/mytemplate.tsx
+npx plop page        # creates all files for a new page type
 ```
