@@ -1,7 +1,7 @@
 <?php $title = $page->title() . ' | ' . $site->title() ?>
 <?php $url = $page->url() ?>
-<?php $description = $page->metaDescription() ?? $site->defaultMetaDescription() ?>
-<?php $image = $page->metaImage() ?? $site->defaultMetaImage() ?>
+<?php $description = $page->metaDescription()->or($site->defaultMetaDescription()) ?>
+<?php $image = $page->metaImage()->or($site->defaultMetaImage()) ?>
 
 <!DOCTYPE html>
 <html>
@@ -35,7 +35,6 @@
 </head>
 
 <body>
-  <script type="application/json" id="siteData"><?= json_encode($site->json()) ?></script>
   <div id="root"></div>
   <?= Vite::js("src/main.tsx") ?>
 </body>

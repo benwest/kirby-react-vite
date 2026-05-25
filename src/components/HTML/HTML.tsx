@@ -1,12 +1,9 @@
-import { styled } from "@/styled-system/jsx"
-import { HTMLStyledProps } from "@/styled-system/types"
+import { ComponentProps } from "react"
 
-export type HTMLProps = Omit<HTMLStyledProps<"div">, "children"> & {
-  children?: string
+export type HTMLProps = Omit<ComponentProps<"div">, "children"> & {
+  children?: string | null
 }
 
 export function HTML({ children = "", ...props }: HTMLProps) {
-  return (
-    <styled.div {...props} dangerouslySetInnerHTML={{ __html: children }} />
-  )
+  return <div {...props} dangerouslySetInnerHTML={{ __html: children ?? "" }} />
 }

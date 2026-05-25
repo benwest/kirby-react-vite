@@ -1,4 +1,4 @@
-import { usePage } from "@/hooks/usePage"
+import { usePage } from "@/components/Page"
 
 export default function HomePage() {
   const page = usePage("home")

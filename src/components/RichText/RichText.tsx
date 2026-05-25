@@ -1,13 +1,8 @@
-import { styled } from "@/styled-system/jsx"
-import { HTML } from "../HTML"
-import { ComponentProps } from "react"
+import { twMerge } from "tailwind-merge"
+import { HTML, HTMLProps } from "../HTML"
 
-export const RichText = styled(HTML, {
-  base: {
-    "& > *:not(:last-child)": {
-      marginBottom: 4,
-    },
-  },
-})
+export type RichTextProps = HTMLProps
 
-export type RichTextProps = ComponentProps<typeof RichText>
+export function RichText({ className, ...props }: RichTextProps) {
+  return <HTML className={twMerge("rich-text", className)} {...props} />
+}

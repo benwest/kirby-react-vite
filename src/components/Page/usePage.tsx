@@ -1,4 +1,4 @@
-import { PageContent } from "@/content/pages"
+import { PageContent } from "@/types/pages"
 import { useContext } from "react"
 import { PageContext } from "./PageContext"
 

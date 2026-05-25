@@ -1,6 +1,2 @@
-import { Link as BaseLink } from "react-router-dom"
-import { styled } from "@/styled-system/jsx"
-import { ComponentProps } from "react"
-
-export const Link = styled(BaseLink)
-export type LinkProps = ComponentProps<typeof Link>
+export { Link } from "react-router-dom"
+export type { LinkProps } from "react-router-dom"
