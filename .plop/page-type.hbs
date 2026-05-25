@@ -1,0 +1,8 @@
+import { z } from "zod"
+
+export const {{properCase type}}PageContent = z.object({
+  type: z.literal("{{dashCase type}}"),
+  url: z.string(),
+  title: z.string(),
+})
+export type {{properCase type}}PageContent = z.infer<typeof {{properCase type}}PageContent>

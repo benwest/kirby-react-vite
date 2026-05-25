@@ -39,14 +39,60 @@ export default function plopfile(plop) {
       },
     ],
     actions: [
+      // React page component
       {
         type: "add",
-        path: "src/pages/{{type}}.tsx",
+        path: "src/pages/{{dashCase type}}.tsx",
         templateFile: ".plop/page.hbs",
+      },
+      // Zod type schema
+      {
+        type: "add",
+        path: "src/types/pages/{{dashCase type}}.ts",
+        templateFile: ".plop/page-type.hbs",
+      },
+      // Kirby JSON template
+      {
+        type: "add",
+        path: "www/site/json/pages/{{dashCase type}}.php",
+        templateFile: ".plop/page-json.hbs",
+      },
+      // Kirby blueprint
+      {
+        type: "add",
+        path: "www/site/blueprints/pages/{{dashCase type}}.yml",
+        templateFile: ".plop/page-blueprint.hbs",
+      },
+      // Patch src/types/pages/index.ts — add import
+      {
+        type: "modify",
+        path: "src/types/pages/index.ts",
+        pattern: /\/\/ plop:imports/,
+        template:
+          'import { {{properCase type}}PageContent } from "./{{dashCase type}}"\n// plop:imports',
+      },
+      // Patch src/types/pages/index.ts — add to discriminated union
+      {
+        type: "modify",
+        path: "src/types/pages/index.ts",
+        pattern: /\/\/ plop:union/,
+        template: "{{properCase type}}PageContent,\n  // plop:union",
       },
       {
         type: "open",
-        path: "src/pages/{{type}}.tsx",
+        path: "src/pages/{{dashCase type}}.tsx",
+      },
+      {
+        type: "open",
+        path: "src/types/pages/{{dashCase type}}.ts",
+      },
+      {
+        type: "open",
+        path: "www/site/json/pages/{{dashCase type}}.php",
+      },
+      {
+        type: "open",
+        path: "www/site/blueprints/pages/{{dashCase type}}.yml",
       },
     ],
   })

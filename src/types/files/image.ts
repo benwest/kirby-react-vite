@@ -5,5 +5,4 @@ export const ImageFileContent = z.object({
   srcSet: z.string(),
   ratio: z.number(),
 })
-
 export type ImageFileContent = z.infer<typeof ImageFileContent>
